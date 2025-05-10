@@ -27,7 +27,21 @@ sources:
           - name: o_orderkey
             description: Primary key of the Orders table
             tests: 
-              # this applies the tests unique and not_null to the o_orderkey colum 
+              - elementary.volume_anomalies:
+                timestamp_column: "ingest_timestamp"
+                time_bucket:
+                  period: hour  # Establecemos la segmentación horaria
+                  count: 1  # Un solo bucket por hora
+                detection_period:
+                  period: day  # Monitoreo en ventanas de 2 horas
+                  count: 1  # Detección de anomalías en las últimas 2 horas
+                training_period:
+                  period: day  # Entrenamiento cada semana
+                  count: 7  # Aprender los últimos 7 días
+                fail_on_zero: true  # Falla si el volumen es 0 (sin datos)
+                tags: ["elementary"]
+                config:
+                  severity: warn                         
               - unique
               - not_null
           - name: o_custkey
